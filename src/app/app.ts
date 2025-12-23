@@ -1,12 +1,38 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TodoStore } from './todo.store';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss'],
 })
-export class App {
-  protected readonly title = signal('project');
+export class AppComponent {
+  store = inject(TodoStore);
+  newTodoTitle = signal('');
+  searchInput = signal('');
+
+  constructor() {
+    // Load todos khi component khởi tạo
+    this.store.loadTodos();
+
+    // Effect để theo dõi search input và gọi rxMethod
+    effect(() => {
+      this.store.searchTodos(this.searchInput());
+    });
+  }
+
+  addTodo() {
+    const title = this.newTodoTitle().trim();
+    if (title) {
+      this.store.addTodo(title);
+      this.newTodoTitle.set('');
+    }
+  }
+
+  onSearchChange(value: string) {
+    this.searchInput.set(value);
+  }
 }

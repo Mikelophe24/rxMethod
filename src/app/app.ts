@@ -15,9 +15,6 @@ export class AppComponent {
   searchInput = signal('');
 
   constructor() {
-    // Load todos khi component khởi tạo
-    this.store.loadTodos();
-
     // Effect để theo dõi search input và gọi rxMethod
     effect(() => {
       this.store.searchTodos(this.searchInput());
